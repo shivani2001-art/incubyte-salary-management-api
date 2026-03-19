@@ -38,8 +38,6 @@ module Api
 
       def set_employee
         @employee = Employee.find(params[:id])
-      rescue ActiveRecord::RecordNotFound
-        render json: { error: "Employee not found" }, status: :not_found
       end
 
       def employee_params
