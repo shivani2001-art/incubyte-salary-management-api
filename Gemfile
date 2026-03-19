@@ -36,6 +36,15 @@ gem "rack-cors"
 gem "rswag-api"
 gem "rswag-ui"
 
+# JSON serialization
+gem "blueprinter"
+
+# Pagination
+gem "pagy", "~> 9.0"
+
+# Rate limiting
+gem "rack-attack"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

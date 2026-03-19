@@ -22,11 +22,13 @@ RSpec.describe "Api::V1::Employees", type: :request do
   describe "GET /api/v1/employees/:id" do
     let(:employee) { create(:employee) }
 
-    it "returns the employee" do
+    it "returns the employee without timestamps" do
       get "/api/v1/employees/#{employee.id}", headers: auth_headers(user)
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
       expect(body["full_name"]).to eq(employee.full_name)
+      expect(body).not_to have_key("created_at")
+      expect(body).not_to have_key("updated_at")
     end
 
     it "returns 404 for non-existent employee" do

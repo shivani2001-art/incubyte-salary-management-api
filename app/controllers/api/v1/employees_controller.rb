@@ -5,17 +5,17 @@ module Api
 
       def index
         employees = Employee.all
-        render json: employees, status: :ok
+        render json: EmployeeBlueprint.render(employees), status: :ok
       end
 
       def show
-        render json: @employee, status: :ok
+        render json: EmployeeBlueprint.render(@employee), status: :ok
       end
 
       def create
         employee = Employee.new(employee_params)
         if employee.save
-          render json: employee, status: :created
+          render json: EmployeeBlueprint.render(employee), status: :created
         else
           render json: { errors: employee.errors.full_messages }, status: :unprocessable_entity
         end
@@ -23,7 +23,7 @@ module Api
 
       def update
         if @employee.update(employee_params)
-          render json: @employee, status: :ok
+          render json: EmployeeBlueprint.render(@employee), status: :ok
         else
           render json: { errors: @employee.errors.full_messages }, status: :unprocessable_entity
         end

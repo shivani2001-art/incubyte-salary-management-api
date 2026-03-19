@@ -84,6 +84,7 @@ GEM
     bcrypt_pbkdf (1.1.2-arm64-darwin)
     bcrypt_pbkdf (1.1.2-x86_64-darwin)
     bigdecimal (4.0.1)
+    blueprinter (1.2.1)
     bootsnap (1.23.0)
       msgpack (~> 1.2)
     brakeman (8.0.4)
@@ -200,6 +201,7 @@ GEM
     nokogiri (1.19.1-x86_64-linux-musl)
       racc (~> 1.4)
     ostruct (0.6.3)
+    pagy (9.4.0)
     parallel (1.27.0)
     parser (3.3.10.2)
       ast (~> 2.4.1)
@@ -217,6 +219,8 @@ GEM
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.2.5)
+    rack-attack (6.8.0)
+      rack (>= 1.0, < 4)
     rack-cors (3.0.0)
       logger
       rack (>= 3.0.14)
@@ -389,6 +393,7 @@ PLATFORMS
 
 DEPENDENCIES
   bcrypt (~> 3.1.7)
+  blueprinter
   bootsnap
   brakeman
   bundler-audit
@@ -398,7 +403,9 @@ DEPENDENCIES
   faker
   jwt
   kamal
+  pagy (~> 9.0)
   puma (>= 5.0)
+  rack-attack
   rack-cors
   rails (~> 8.1.2)
   rspec-rails (~> 7.0)
