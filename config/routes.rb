@@ -5,7 +5,9 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :employees
+      resources :employees do
+        resource :salary, only: [:show], controller: "salary_calculations"
+      end
     end
   end
 end
