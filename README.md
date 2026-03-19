@@ -8,7 +8,7 @@ A production-ready Rails API for managing employees, calculating salary deductio
 |-----------------|------------------|
 | Language        | Ruby 3.3.10      |
 | Framework       | Rails 8.1.2 (API mode) |
-| Database        | SQLite3          |
+| Database        | SQLite3          |  
 | Authentication  | JWT (stateless)  |
 | Testing         | RSpec, FactoryBot, Shoulda Matchers |
 | API Docs        | Swagger UI (rswag) |
@@ -151,39 +151,13 @@ This project was built using strict **red-green-refactor** TDD. The commit histo
 
 Each feature (auth, CRUD, salary calculation, metrics) follows this cycle. Run `git log --oneline` to see the full progression.
 
-## Deployment (Render)
+## Live Demo
 
-Vercel doesn't support Ruby/Rails. [Render](https://render.com) is the easiest free option.
+Deployed on [Render](https://render.com):
 
-### Steps
+> **https://incubyte-salary-api.onrender.com**
 
-1. Push your code to GitHub
-2. Go to [render.com](https://render.com) and sign up / log in
-3. Click **New > Web Service**
-4. Connect your GitHub repo
-5. Configure the service:
-
-| Setting | Value |
-|---------|-------|
-| **Runtime** | Ruby |
-| **Build Command** | `bundle install && bin/rails db:migrate && bin/rails db:seed` |
-| **Start Command** | `bin/rails server -b 0.0.0.0 -p $PORT` |
-| **Environment** | Set `RAILS_ENV=production`, `RAILS_MASTER_KEY=<your key>`, `SECRET_KEY_BASE=<generate one>` |
-
-6. Click **Deploy**
-
-### Generate a secret key
-
-```bash
-bin/rails secret
-```
-
-Copy the output and set it as `SECRET_KEY_BASE` in Render's environment variables.
-
-### Notes
-
-- Render's free tier uses ephemeral storage — SQLite data resets on each deploy. For persistence, switch to PostgreSQL (Render offers a free managed Postgres instance).
-- Your `config/credentials.yml.enc` requires `RAILS_MASTER_KEY` to decrypt in production. Find it in `config/master.key` locally.
+Swagger UI is available at the root URL. Free tier may take ~30s to wake up on first request.
 
 ## Implementation Details
 
