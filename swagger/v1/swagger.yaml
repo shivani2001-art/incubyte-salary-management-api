@@ -1,0 +1,332 @@
+openapi: 3.0.1
+info:
+  title: Salary Management API
+  description: Employee management and salary calculation API
+  version: v1
+
+components:
+  securitySchemes:
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+        full_name:
+          type: string
+        job_title:
+          type: string
+        country:
+          type: string
+        salary:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    EmployeeInput:
+      type: object
+      required:
+        - full_name
+        - job_title
+        - country
+        - salary
+      properties:
+        employee:
+          type: object
+          properties:
+            full_name:
+              type: string
+              example: John Doe
+            job_title:
+              type: string
+              example: Engineer
+            country:
+              type: string
+              example: India
+            salary:
+              type: number
+              example: 75000.00
+    SalaryCalculation:
+      type: object
+      properties:
+        gross_salary:
+          type: string
+        deductions:
+          type: object
+          properties:
+            tds:
+              type: string
+        total_deductions:
+          type: string
+        net_salary:
+          type: string
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+paths:
+  /auth/signup:
+    post:
+      summary: Register a new user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '201':
+          description: User created, returns JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '422':
+          description: Validation errors (duplicate email, missing password, etc.)
+
+  /auth/login:
+    post:
+      summary: Login and get JWT token
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: admin@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Invalid credentials
+
+  /api/v1/employees:
+    get:
+      summary: List all employees
+      tags:
+        - Employees
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: List of employees
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+        '401':
+          description: Unauthorized
+    post:
+      summary: Create an employee
+      tags:
+        - Employees
+      security:
+        - bearer_auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeInput'
+      responses:
+        '201':
+          description: Employee created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '422':
+          description: Validation errors
+
+  /api/v1/employees/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get an employee
+      tags:
+        - Employees
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Employee found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '404':
+          description: Employee not found
+    put:
+      summary: Update an employee
+      tags:
+        - Employees
+      security:
+        - bearer_auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeInput'
+      responses:
+        '200':
+          description: Employee updated
+        '404':
+          description: Employee not found
+        '422':
+          description: Validation errors
+    delete:
+      summary: Delete an employee
+      tags:
+        - Employees
+      security:
+        - bearer_auth: []
+      responses:
+        '204':
+          description: Employee deleted
+        '404':
+          description: Employee not found
+
+  /api/v1/employees/{employee_id}/salary:
+    parameters:
+      - name: employee_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Calculate salary with deductions
+      description: "Returns gross salary, deductions (TDS), and net salary. India: 10% TDS, United States: 12% TDS, Others: no deductions."
+      tags:
+        - Salary Calculation
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Salary breakdown
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalaryCalculation'
+        '404':
+          description: Employee not found
+
+  /api/v1/salary_metrics/by_country:
+    get:
+      summary: Salary metrics by country
+      description: Returns min, max, average salary and employee count for a given country.
+      tags:
+        - Salary Metrics
+      security:
+        - bearer_auth: []
+      parameters:
+        - name: country
+          in: query
+          required: true
+          schema:
+            type: string
+          example: India
+      responses:
+        '200':
+          description: Salary metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  country:
+                    type: string
+                  min_salary:
+                    type: string
+                  max_salary:
+                    type: string
+                  avg_salary:
+                    type: string
+                  employee_count:
+                    type: integer
+        '400':
+          description: Missing country parameter
+        '404':
+          description: No employees found
+
+  /api/v1/salary_metrics/by_job_title:
+    get:
+      summary: Average salary by job title
+      description: Returns average salary and employee count for a given job title.
+      tags:
+        - Salary Metrics
+      security:
+        - bearer_auth: []
+      parameters:
+        - name: job_title
+          in: query
+          required: true
+          schema:
+            type: string
+          example: Engineer
+      responses:
+        '200':
+          description: Salary metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_title:
+                    type: string
+                  avg_salary:
+                    type: string
+                  employee_count:
+                    type: integer
+        '400':
+          description: Missing job_title parameter
+        '404':
+          description: No employees found
