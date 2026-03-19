@@ -12,6 +12,9 @@ A production-ready Rails API for managing employees, calculating salary deductio
 | Authentication  | JWT (stateless)  |
 | Testing         | RSpec, FactoryBot, Shoulda Matchers |
 | API Docs        | Swagger UI (rswag) |
+| Serialization   | Blueprinter        |
+| Pagination      | Pagy               |
+| Rate Limiting   | Rack::Attack       |
 
 ## Prerequisites
 
@@ -54,7 +57,7 @@ The seed creates:
 bundle exec rspec
 ```
 
-Currently **49 specs**, all passing — covering models, services, and request specs for every endpoint.
+Currently **58 specs**, all passing — covering models, services, serializers, pagination, rate limiting, and request specs for every endpoint.
 
 ## API Endpoints
 
@@ -62,7 +65,7 @@ Currently **49 specs**, all passing — covering models, services, and request s
 |--------|----------|-------------|------|
 | POST | `/auth/signup` | Register a new user | No |
 | POST | `/auth/login` | Login, get JWT token | No |
-| GET | `/api/v1/employees` | List all employees | Yes |
+| GET | `/api/v1/employees` | List all employees (paginated) | Yes |
 | GET | `/api/v1/employees/:id` | Get single employee | Yes |
 | POST | `/api/v1/employees` | Create employee | Yes |
 | PUT | `/api/v1/employees/:id` | Update employee | Yes |
@@ -111,6 +114,56 @@ curl "http://localhost:3000/api/v1/salary_metrics/by_job_title?job_title=Enginee
 | country    | string  | Yes      |       |
 | salary     | decimal | Yes      | Must be > 0 |
 
+### Pagination
+
+The `GET /api/v1/employees` endpoint is paginated (20 per page by default).
+
+```bash
+# Page 2, 10 per page
+curl "http://localhost:3000/api/v1/employees?page=2&per_page=10" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Response headers include:
+| Header | Description |
+|--------|-------------|
+| `Current-Page` | Current page number |
+| `Total-Pages` | Total number of pages |
+| `Total-Count` | Total number of records |
+
+### Rate Limiting
+
+Auth and API endpoints are protected by rate limiting (Rack::Attack) to prevent brute-force attacks.
+
+| Endpoint | Limit | Window |
+|----------|-------|--------|
+| `POST /auth/login` | 5 requests | per 60 seconds |
+| `POST /auth/signup` | 5 requests | per 60 seconds |
+| `/api/*` | 100 requests | per 60 seconds |
+
+Exceeding the limit returns a `429 Too Many Requests` response:
+
+```bash
+# Demonstrate rate limiting - send 6 rapid login attempts
+for i in $(seq 1 6); do
+  echo "Request $i: $(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:3000/auth/login \
+    -H 'Content-Type: application/json' \
+    -d '{"email": "test@test.com", "password": "wrong"}')"
+done
+
+# Output:
+# Request 1: 401
+# Request 2: 401
+# Request 3: 401
+# Request 4: 401
+# Request 5: 401
+# Request 6: 429  <-- rate limited
+```
+
+### JSON Serialization
+
+API responses use Blueprinter serializers to control which fields are exposed. Employee responses return only `id`, `full_name`, `job_title`, `country`, and `salary` — no internal fields like `created_at` or `updated_at`.
+
 ### Salary Deduction Rules
 
 | Country       | Deduction | Rate |
@@ -133,6 +186,8 @@ app/
 │       ├── employees_controller.rb      # CRUD
 │       ├── salary_calculations_controller.rb
 │       └── salary_metrics_controller.rb
+├── blueprints/
+│   └── employee_blueprint.rb            # JSON serializer (controls exposed fields)
 ├── models/
 │   ├── user.rb                          # has_secure_password, email validation
 │   └── employee.rb                      # Presence + numericality validations
