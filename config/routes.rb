@@ -8,6 +8,9 @@ Rails.application.routes.draw do
       resources :employees do
         resource :salary, only: [:show], controller: "salary_calculations"
       end
+
+      get "salary_metrics/by_country", to: "salary_metrics#by_country"
+      get "salary_metrics/by_job_title", to: "salary_metrics#by_job_title"
     end
   end
 end
