@@ -1,10 +1,15 @@
 module Api
   module V1
     class EmployeesController < ApplicationController
+      include Pagy::Backend
+
       before_action :set_employee, only: %i[show update destroy]
 
       def index
-        employees = Employee.all
+        pagy, employees = pagy(Employee.all, limit: params[:per_page] || Pagy::DEFAULT[:limit])
+        response.headers["Current-Page"] = pagy.page.to_s
+        response.headers["Total-Pages"] = pagy.pages.to_s
+        response.headers["Total-Count"] = pagy.count.to_s
         render json: EmployeeBlueprint.render(employees), status: :ok
       end
 
