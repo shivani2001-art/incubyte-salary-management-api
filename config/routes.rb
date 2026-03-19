@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
-  root to: redirect('/api-docs')
+  root to: redirect("/api-docs")
 
-  mount Rswag::Ui::Engine => '/api-docs'
-  mount Rswag::Api::Engine => '/api-docs'
+  mount Rswag::Ui::Engine => "/api-docs"
+  mount Rswag::Api::Engine => "/api-docs"
 
   get "up" => "rails/health#show", as: :rails_health_check
 
@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :employees do
-        resource :salary, only: [:show], controller: "salary_calculations"
+        resource :salary, only: [ :show ], controller: "salary_calculations"
       end
 
       get "salary_metrics/by_country", to: "salary_metrics#by_country"

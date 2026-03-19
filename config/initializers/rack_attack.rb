@@ -16,7 +16,7 @@ class Rack::Attack
 
   # Return 429 with JSON body
   self.throttled_responder = lambda do |req|
-    [429, { "Content-Type" => "application/json" }, [{ error: "Rate limit exceeded. Try again later." }.to_json]]
+    [ 429, { "Content-Type" => "application/json" }, [ { error: "Rate limit exceeded. Try again later." }.to_json ] ]
   end
 end
 

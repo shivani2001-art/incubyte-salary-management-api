@@ -1,5 +1,5 @@
 class AuthenticationController < ApplicationController
-  skip_before_action :authenticate_request!, only: [:login, :signup], raise: false
+  skip_before_action :authenticate_request!, only: [ :login, :signup ], raise: false
 
   def signup
     user = User.new(email: params[:email], password: params[:password])
