@@ -144,11 +144,26 @@ paths:
 
   /api/v1/employees:
     get:
-      summary: List all employees
+      summary: List all employees (paginated)
       tags:
         - Employees
       security:
         - bearer_auth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+          description: Number of results per page
       responses:
         '200':
           description: List of employees
