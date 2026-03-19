@@ -210,7 +210,7 @@ Each feature (auth, CRUD, salary calculation, metrics) follows this cycle. Run `
 
 Deployed on [Render](https://render.com):
 
-> **https://incubyte-salary-api.onrender.com**
+> **https://incubyte-salary-management-api.onrender.com**
 
 Swagger UI is available at the root URL. Free tier may take ~30s to wake up on first request.
 
